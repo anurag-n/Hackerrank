@@ -1,4 +1,5 @@
-/* Thoughts
+/* Problem - https://www.hackerrank.com/challenges/electronics-shop
+ * Solution
 We sum each pair and check if the sum <= s and > max
 If true, we set it as new max and then finally return it as result
 */
