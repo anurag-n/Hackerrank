@@ -1,6 +1,9 @@
 /* Problem - https://www.hackerrank.com/challenges/climbing-the-leaderboard
  * Solution
- 
+ First, we convert the scores array to another sorted array with distinct values. 
+ Now all we need to do is do a binary search on this array to find the rank.
+ We save previous rank so that we don't have to traverse through the starting redundant values.
+ Time Complexity  = O(m*logn) (Actually we are going to do better than that)
  */
 import java.io.*;
 import java.util.*;
@@ -10,24 +13,17 @@ import java.util.regex.*;
 
 public class Solution {
     
-    public static int ranking(int n, int score, int[] scores){
-        int[] rankings = new int[n];
-        int rank = 1;
-        rankings[0] = rank;
-        for(int i = 1; i < n; i++){
-            if(scores[i] < scores[i-1]) rank++;
-            rankings[i] = rank;
+    public static int find_rank(int score, Integer[] scores, int l, int r){
+        if(r>l){
+            int mid = (l+r)/2;
+            if(score==scores[mid]) return mid+1;
+            else if(score>scores[mid]) return find_rank(score, scores, mid+1, r);
+            else return find_rank(score, scores, l, mid-1);
         }
-        int final_rank = rankings[n-1] + 1;
-        if(score >= scores[0]) final_rank = 1;
-        else if(score == scores[n-1]) final_rank = rankings[n-1];
-        else {
-            for(int i = 1; i < n; i++){
-                if(score>scores[i] && score<scores[i-1]) final_rank = rankings[i-1]+1;
-                else if(score==scores[i]) final_rank = rankings[i];
-            }
+        else{
+            if(score>=scores[l]) return l+1;
+            else return l;
         }
-        return final_rank;
     }
 
     public static void main(String[] args) {
@@ -37,13 +33,21 @@ public class Solution {
         for(int scores_i=0; scores_i < n; scores_i++){
             scores[scores_i] = in.nextInt();
         }
+        List <Integer> list = new ArrayList <Integer>();
+        for(int i = 0; i < scores.length; i++){
+            list.add(scores[i]);
+        }
+        Set <Integer> scores_un = new TreeSet <Integer> (list);
+        Integer[] ar_scores_un = scores_un.toArray(new Integer[scores_un.size()]);
         int m = in.nextInt();
         int[] alice = new int[m];
+        int k = ar_scores_un.length;
+        int prev_rank = 0;
         for(int alice_i=0; alice_i < m; alice_i++){
             alice[alice_i] = in.nextInt();
-            int result = ranking(n, alice[alice_i], scores);
-            System.out.println(result);
+            int result = find_rank(alice[alice_i], ar_scores_un, prev_rank >k-1? k-1 : prev_rank,k-1);
+            prev_rank = result;
+            System.out.println(k- result + 1);
         }
-        // your code goes here
     }
 }
